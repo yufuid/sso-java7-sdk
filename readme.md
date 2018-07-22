@@ -1,17 +1,17 @@
-玉符单点登录 SDK
+#玉符单点登录 SDK
 ======
 玉符SDK集成了签署和验证JWT令牌的功能，使得身份提供者（IDP）和服务提供者（SP）只需要用很少的工作量就可以快速将玉符提供的单点登录等功能集成到现有的服务中。
 
 ## 单点登录SDK简介
 
-* 作为服务提供者（SP）,可以使用玉符SDK验证JWT令牌的有效性（包括有效期、签名等），验证成功后可取出token中字段进行相应的鉴权。
-* 作为身份提供者（IDP）,可以使用玉符SDK灵活进行参数配置，并生成带有token的跳转url，进行单点登录功能。
+- 作为服务提供者（SP）,可以使用玉符SDK验证JWT令牌的有效性（包括有效期、签名等），验证成功后可取出token中字段进行相应的鉴权。
+- 作为身份提供者（IDP）,可以使用玉符SDK灵活进行参数配置，并生成带有token的跳转url，进行单点登录功能。
 
 
 ## 集成SDK
 使用库方法
-  * 将`javasdk-{version}.jar`文件添加到项目的library中，确保路径配置正确。
-  * 若项目使用了maven，则在pom.xml中添加如下dependency
+  - 将`javasdk-{version}.jar`文件添加到项目的library中，确保路径配置正确。
+  - 若项目使用了maven，则在pom.xml中添加如下dependency
   ```
   <dependency>
        <groupId>com.yufu.idaas</groupId>
