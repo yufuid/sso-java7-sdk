@@ -59,7 +59,7 @@ public class IDPRoleTest {
         JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
         Assert.assertEquals("testAppInstanceId", claimsSet.getStringClaim(APP_INSTANCE_ID_KEY));
         Assert.assertEquals("testIssuer", claimsSet.getIssuer());
-        Assert.assertEquals("testTenant", claimsSet.getStringClaim("tnt_id"));
+        Assert.assertEquals("testTenant", claimsSet.getStringClaim("tnt"));
     }
 
 }

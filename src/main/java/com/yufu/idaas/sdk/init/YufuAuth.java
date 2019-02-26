@@ -29,7 +29,9 @@ public class YufuAuth implements IYufuAuth {
         String keyFingerPrint
     ) throws YufuInitException {
         this.tenantId = tenantId;
-        String keyId = issuer + YufuTokenConstants.KEY_ID_SEPARATOR + keyFingerPrint;
+        String keyId = keyFingerPrint == null
+            ? issuer
+            : issuer + YufuTokenConstants.KEY_ID_SEPARATOR + keyFingerPrint;
         this.tokenGenerator = new RSATokenGenerator(keyPath, null, issuer, tenantId, keyId);
     }
 
@@ -52,7 +54,7 @@ public class YufuAuth implements IYufuAuth {
 
             return new URL((YufuTokenConstants.IDP_TOKEN_CONSUME_URL +
                 "?idp_token=" +
-                this.tokenGenerator.generate(Claims)).replace("{tenantId}", this.tenantId));
+                this.tokenGenerator.generate(Claims)));
         } catch (MalformedURLException e) {
             throw new GenerateException("Can not generate redirect Url " + e.getMessage());
         }
@@ -126,9 +128,6 @@ public class YufuAuth implements IYufuAuth {
                     throw new YufuInitException("Private Key must be set with IDP Role");
                 }
 
-                if (keyFingerPrint == null || "".equals(keyFingerPrint)) {
-                    throw new YufuInitException("Key fingerPrint must be set with IDP Role");
-                }
                 return new YufuAuth(
                     this.issuer,
                     this.privateKeyPath,
