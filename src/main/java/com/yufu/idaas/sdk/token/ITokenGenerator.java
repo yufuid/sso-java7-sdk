@@ -9,4 +9,6 @@ import java.util.Map;
  */
 public interface ITokenGenerator {
     String generate(Map<String, Object> payload) throws GenerateException;
+
+    String generate(JWT jwt) throws GenerateException;
 }

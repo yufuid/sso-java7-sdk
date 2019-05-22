@@ -1,9 +1,9 @@
 package com.yufu.idaas.sdk.init;
 
-import com.yufu.idaas.sdk.constants.YufuSdkRoleConstants;
+import com.yufu.idaas.sdk.constants.SDKRole;
 import com.yufu.idaas.sdk.constants.YufuTokenConstants;
+import com.yufu.idaas.sdk.exception.BaseVerifyException;
 import com.yufu.idaas.sdk.exception.GenerateException;
-import com.yufu.idaas.sdk.exception.VerifyException;
 import com.yufu.idaas.sdk.exception.YufuInitException;
 import com.yufu.idaas.sdk.token.*;
 
@@ -11,8 +11,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import static com.yufu.idaas.sdk.constants.YufuSdkRoleConstants.ROLE_IDP;
-import static com.yufu.idaas.sdk.constants.YufuSdkRoleConstants.ROLE_SP;
+import static com.yufu.idaas.sdk.constants.SDKRole.IDP;
+import static com.yufu.idaas.sdk.constants.SDKRole.SP;
 
 /**
  * Created by shuowang on 2018/5/2.
@@ -20,7 +20,6 @@ import static com.yufu.idaas.sdk.constants.YufuSdkRoleConstants.ROLE_SP;
 public class YufuAuth implements IYufuAuth {
     private ITokenGenerator tokenGenerator;
     private ITokenVerifier tokenVerifier;
-    private String tenantId;
 
     private YufuAuth(
         String issuer,
@@ -28,7 +27,6 @@ public class YufuAuth implements IYufuAuth {
         String tenantId,
         String keyFingerPrint
     ) throws YufuInitException {
-        this.tenantId = tenantId;
         String keyId = keyFingerPrint == null
             ? issuer
             : issuer + YufuTokenConstants.KEY_ID_SEPARATOR + keyFingerPrint;
@@ -60,7 +58,23 @@ public class YufuAuth implements IYufuAuth {
         }
     }
 
-    public JWT verify(final String id_token) throws VerifyException {
+    @Override
+    public String generateToken(final JWT jwt) throws GenerateException {
+        return this.tokenGenerator.generate(jwt);
+    }
+
+    @Override
+    public URL generateIDPRedirectUrl(final JWT jwt) throws GenerateException {
+        try {
+            return new URL((YufuTokenConstants.IDP_TOKEN_CONSUME_URL +
+                "?idp_token=" +
+                this.tokenGenerator.generate(jwt)));
+        } catch (MalformedURLException e) {
+            throw new GenerateException("Can not generate redirect Url " + e.getMessage());
+        }
+    }
+
+    public JWT verify(final String id_token) throws BaseVerifyException {
         return this.tokenVerifier.verify(id_token);
     }
 
@@ -71,7 +85,7 @@ public class YufuAuth implements IYufuAuth {
         private String issuer;
         private String keyFingerPrint;
         private String tenantId;
-        private YufuSdkRoleConstants sdkRole;
+        private SDKRole sdkRole;
 
         public Builder privateKeyPath(String path) {
             this.privateKeyPath = path;
@@ -103,13 +117,13 @@ public class YufuAuth implements IYufuAuth {
             return this;
         }
 
-        public Builder sdkRole(YufuSdkRoleConstants sdkRole) {
+        public Builder sdkRole(SDKRole sdkRole) {
             this.sdkRole = sdkRole;
             return this;
         }
 
         public YufuAuth build() throws YufuInitException {
-            if (this.sdkRole == ROLE_SP) {
+            if (this.sdkRole == SP) {
                 if (publicKeyPath != null) {
                     return new YufuAuth(
                         this.publicKeyPath, true
@@ -123,7 +137,7 @@ public class YufuAuth implements IYufuAuth {
                 }
             }
 
-            if (this.sdkRole == ROLE_IDP) {
+            if (this.sdkRole == IDP) {
                 if (privateKeyPath == null || "".equals(privateKeyPath)) {
                     throw new YufuInitException("Private Key must be set with IDP Role");
                 }

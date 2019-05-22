@@ -3,6 +3,7 @@ package com.yufu.idaas.sdk.authn;
 import com.yufu.idaas.sdk.bouncycastle.asn1.pkcs.RSAPublicKey;
 import com.yufu.idaas.sdk.bouncycastle.util.io.pem.PemReader;
 import com.yufu.idaas.sdk.exception.CannotRetrieveKeyException;
+import org.apache.commons.io.Charsets;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -19,7 +20,8 @@ public class FilePublicKeySupplier implements IKeySupplier<RSAPublicKey> {
 
         try {
             PemReader reader = new PemReader(new InputStreamReader(
-                new FileInputStream(path), "UTF-8"));
+                new FileInputStream(path), Charsets.UTF_8
+            ));
             byte[] keyBytes = reader.readPemObject().getContent();
             KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
             KeyFactory factory = KeyFactory.getInstance("RSA");
@@ -31,7 +33,7 @@ public class FilePublicKeySupplier implements IKeySupplier<RSAPublicKey> {
 
     public RSAPublicKey getKeyFromString(final String keyString) throws CannotRetrieveKeyException {
         try {
-            byte[] keyBytes = keyString.getBytes("UTF-8");
+            byte[] keyBytes = keyString.getBytes(Charsets.UTF_8);
             KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPublicKey) factory.generatePublic(keySpec);

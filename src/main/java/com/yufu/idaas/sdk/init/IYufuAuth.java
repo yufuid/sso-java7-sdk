@@ -11,6 +11,12 @@ import java.util.Map;
  */
 public interface IYufuAuth {
     String generateToken(Map<String, Object> Claims) throws GenerateException;
+
     URL generateIDPRedirectUrl(Map<String, Object> Claims) throws GenerateException;
+
+    String generateToken(JWT jwt) throws GenerateException;
+
+    URL generateIDPRedirectUrl(JWT jwt) throws GenerateException;
+
     JWT verify(String id_token) throws Exception;
 }

@@ -6,7 +6,7 @@
 
     <groupId>com.yufu.idaas</groupId>
     <artifactId>javasdk</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -39,8 +39,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <compilerArgument>-Xlint</compilerArgument>
                 </configuration>
             </plugin>
@@ -87,15 +87,19 @@
                             <relocations>
                                 <relocation>
                                     <pattern>org.</pattern>
-                                    <shadedPattern>com.yufu.sso.sdk.org.</shadedPattern>
+                                    <shadedPattern>com.yufu.idaas.sdk.org.</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>net.</pattern>
-                                    <shadedPattern>com.yufu.sso.sdk.net.</shadedPattern>
+                                    <shadedPattern>com.yufu.idaas.sdk.net.</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.</pattern>
-                                    <shadedPattern>com.yufu.sso.sdk.</shadedPattern>
+                                    <pattern>com.google.</pattern>
+                                    <shadedPattern>com.yufu.idaas.sdk.google.</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.nimbusds.</pattern>
+                                    <shadedPattern>com.yufu.idaas.sdk.nimbusds.</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

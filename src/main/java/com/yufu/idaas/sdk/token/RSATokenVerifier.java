@@ -56,16 +56,16 @@ public class RSATokenVerifier implements ITokenVerifier {
             throw new YufuInitException("Public key file can not be read: " + e.getMessage());
         } catch (NoSuchAlgorithmException e) {
             throw new YufuInitException("Cannot find algorithm " + e.getMessage());
-        } catch (InvalidKeySpecException e) {
+        } catch (InvalidKeySpecException | IllegalArgumentException e) {
             throw new YufuInitException("Invalid Key " + e.getMessage());
         }
 
         this.publicKey = publicKey;
     }
 
-    public JWT verify(final String token) throws VerifyException {
-        if (token == null || "".equals(token)) {
-            throw new InvalidTokenException("Token could not be empty");
+    public JWT verify(final String token) throws BaseVerifyException {
+        if (token == null || "".equals(token.trim())) {
+            throw new InvalidTokenException("Token must exist and could not be empty");
         }
 
         SignedJWT jwt;
@@ -77,9 +77,12 @@ public class RSATokenVerifier implements ITokenVerifier {
             if (!verifyExpiration(now, jwt.getJWTClaimsSet().getExpirationTime())) {
                 throw new TokenExpiredException();
             }
-            verifyNotBefore(now, jwt.getJWTClaimsSet().getNotBeforeTime());
+            if (!verifyNotBefore(now, jwt.getJWTClaimsSet().getNotBeforeTime())) {
+                throw new TokenTooEarlyException();
+            }
 
             if (null == publicKey) {
+                // Can't reach
                 throw new CannotRetrieveKeyException();
             }
             // verify signature
@@ -97,10 +100,8 @@ public class RSATokenVerifier implements ITokenVerifier {
         return exp != null && !exp.before(now);
     }
 
-    private void verifyNotBefore(Date now, Date nbf) throws TokenTooEarlyException {
-        if (nbf != null && nbf.after(now)) {
-            throw new TokenTooEarlyException();
-        }
+    private boolean verifyNotBefore(Date now, Date nbf) throws TokenTooEarlyException {
+        return nbf == null || !nbf.after(now);
     }
 
     private boolean verifySignature(SignedJWT jwt, RSAPublicKey publicKey) throws InvalidSignatureException {

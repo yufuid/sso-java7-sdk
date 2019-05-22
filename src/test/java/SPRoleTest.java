@@ -1,4 +1,4 @@
-import com.yufu.idaas.sdk.constants.YufuSdkRoleConstants;
+import com.yufu.idaas.sdk.constants.SDKRole;
 import com.yufu.idaas.sdk.exception.YufuInitException;
 import com.yufu.idaas.sdk.init.IYufuAuth;
 import com.yufu.idaas.sdk.init.YufuAuth;
@@ -23,7 +23,7 @@ public class SPRoleTest {
         String keyPath = SPRoleTest.class.getResource("").getPath() + "keys/testPublicKey.pem";
 
         yufuAuth = YufuAuth.builder()
-            .sdkRole(YufuSdkRoleConstants.ROLE_SP)
+            .sdkRole(SDKRole.SP)
             .publicKeyPath(keyPath)
             .build();
     }

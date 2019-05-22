@@ -30,10 +30,10 @@ import static com.yufu.idaas.sdk.constants.YufuTokenConstants.*;
  * Created by shuowang on 2018/5/2.
  */
 public class RSATokenGenerator implements ITokenGenerator {
-    private RSASSASigner signer;
-    private String issuer;
-    private String tenant;
-    private String keyId;
+    private final RSASSASigner signer;
+    private final String issuer;
+    private final String tenant;
+    private final JWSHeader header;
 
     public RSATokenGenerator(
         String privateKeyPath,
@@ -45,9 +45,12 @@ public class RSATokenGenerator implements ITokenGenerator {
         try {
             this.issuer = issuer;
             this.tenant = tenant;
-            this.keyId = keyId;
+            this.header = new JWSHeader.Builder(JWSAlgorithm.parse("RS256"))
+                .keyID(keyId)
+                .type(JOSEObjectType.JWT)
+                .build();
             if (privateKeyPath == null) {
-                throw new YufuInitException("key filename cannot be blank");
+                throw new YufuInitException("Private key path cannot be blank");
             }
             PEMParser reader = new PEMParser(new InputStreamReader(
                 new FileInputStream(privateKeyPath),
@@ -59,7 +62,7 @@ public class RSATokenGenerator implements ITokenGenerator {
                 keyInfo = (PrivateKeyInfo) object;
             } else if (object instanceof PEMEncryptedKeyPair) {
                 if (password == null) {
-                    throw new YufuInitException("password is required");
+                    throw new YufuInitException("Password is required for private key");
                 }
                 PEMDecryptorProvider provider = new JcePEMDecryptorProviderBuilder().build(password.toCharArray());
                 keyInfo = ((PEMEncryptedKeyPair) object).decryptKeyPair(provider).getPrivateKeyInfo();
@@ -78,10 +81,6 @@ public class RSATokenGenerator implements ITokenGenerator {
     }
 
     public String generate(Map<String, Object> payload) throws GenerateException {
-        JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.parse("RS256"))
-            .keyID(this.keyId)
-            .type(JOSEObjectType.JWT)
-            .build();
         String audience = payload.get("aud") != null ? (String) payload.get("aud") : AUDIENCE_YUFU;
         long now = System.currentTimeMillis();
         JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
@@ -110,4 +109,33 @@ public class RSATokenGenerator implements ITokenGenerator {
         return signedJWT.serialize();
     }
 
+    @Override
+    public String generate(final JWT jwt) throws GenerateException {
+        String audience = jwt.getAudience() != null ? jwt.getAudience() : AUDIENCE_YUFU;
+        long now = System.currentTimeMillis();
+        JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
+            .audience(audience)
+            .expirationTime(new Date(now + TOKEN_EXPIRE_TIME_IN_MS))
+            .issueTime(new Date(now))
+            .issuer(this.issuer)
+            .subject(jwt.getSubject());
+        Set<String> claimRegisteredNames = JWTClaimsSet.getRegisteredNames();
+        Set<String> headerRegisteredNames =JWSHeader.getRegisteredParameterNames();
+        for (Map.Entry<String, Object> claim : jwt.getClaims().entrySet()) {
+            if (!claimRegisteredNames.contains(claim.getKey()) &&
+                !headerRegisteredNames.contains(claim.getKey())) {
+                claimsBuilder.claim(claim.getKey(), claim.getValue());
+            }
+        }
+        if (this.tenant != null) {
+            claimsBuilder.claim(TENANT_ID_KEY, this.tenant);
+        }
+        SignedJWT signedJWT = new SignedJWT(header, claimsBuilder.build());
+        try {
+            signedJWT.sign(signer);
+        } catch (JOSEException e) {
+            throw new GenerateException(e.getMessage());
+        }
+        return signedJWT.serialize();
+    }
 }
