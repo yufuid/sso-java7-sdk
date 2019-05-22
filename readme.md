@@ -28,13 +28,13 @@
 ```
  //方法1:使用公钥路径初始化
  IYufuAuth serviceProvider = YufuAuth.builder()
-             .sdkRole(YufuSdkRoleConstants.ROLE_SP)
+             .sdkRole(SDKRole.SP)
              .publicKeyPath({keyPath})
              .build();
              
  //方法2:使用公钥字符串初始化
  IYufuAuth serviceProvider = YufuAuth.builder()
-             .sdkRole(YufuSdkRoleConstants.ROLE_SP)
+             .sdkRole(SDKRole.SP)
              .publicKeyString({keyString})
              .build();
 ```
@@ -54,7 +54,7 @@
 ```
   IYufuAuth idProvider = YufuAuth.builder()
             .issuer("testIdpId")
-            .sdkRole(YufuSdkRoleConstants.ROLE_IDP)
+            .sdkRole(SDKRole.IDP)
             .tenant("testTenant")
             .privateKeyPath(keyPath)
             .keyFingerPrint("testFingerprint")
