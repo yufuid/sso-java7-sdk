@@ -16,14 +16,17 @@ public class SPRoleTest {
     //有效期到5000年
     private String
         testToken =
-        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50IjoiMjk3MjIwIiwiZXhwIjo5OTUzODcxMzY3NywiaWF0IjoxNTI4NzEzMDc3fQ.cSy7Wye3Gl03tu96fpypXJ_WQa0HTMeMgfdzzfFHhHluuak7YdxnYpuybhjyA4pi4HdJRVeermRIuh4e72dpQGkAcX9jem_WKBNCUgFoO7iTGhhb0G4wfv-G0gfE4AKTmdVBWi8SB5JkhTCWZVFkl-kzWUFGDurod2DD-LljBaQ";
+        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0YXVkIiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ0ZXN0aXNzIiwidG50IjoieXVmdSIsImV4cCI6OTk1Mzg3MTM2NzcsImlhdCI6MTUyODcxMzA3N30.BZudnPe6y4kLbKaxfL85yColdxplc2BUoHDkxyO6ezD0ukEuCNV8P7pUnoO_APf8jdclcvTNFlRbVf97Tk5K6jvtUEnvCbRCz2c5UvSzTAxzmanci3ixFDTBeWFpRm6X-GErY9LbCvBEiTciNUhxSFq04g38f2r18Zr3cuQlmhk";
 
     @Before
     public void setup() throws YufuInitException {
         String keyPath = SPRoleTest.class.getResource("").getPath() + "keys/testPublicKey.pem";
 
         yufuAuth = YufuAuth.builder()
+            .tenant("yufu")
+            .issuer("testiss")
             .sdkRole(SDKRole.SP)
+            .audience("testaud")
             .publicKeyPath(keyPath)
             .build();
     }
@@ -31,8 +34,6 @@ public class SPRoleTest {
     @Test
     public void testVerifyToken() throws Exception {
         JWT jwt = yufuAuth.verify(testToken);
-        Assert.assertEquals("yufu", jwt.getIssuer());
         Assert.assertEquals("test@yufu.com", jwt.getSubject());
-        Assert.assertEquals("297220", jwt.getClaims().get("tnt"));
     }
 }

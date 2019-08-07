@@ -9,6 +9,8 @@ import com.yufu.idaas.sdk.token.*;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.yufu.idaas.sdk.constants.SDKRole.IDP;
@@ -34,9 +36,9 @@ public class YufuAuth implements IYufuAuth {
     }
 
     private YufuAuth(
-        String keyInfo, boolean isFilePath
+        String tenantId, String issuer, List<String> audience, String keyInfo, boolean isFilePath
     ) throws YufuInitException {
-        this.tokenVerifier = new RSATokenVerifier(keyInfo, isFilePath);
+        this.tokenVerifier = new RSATokenVerifier(tenantId, issuer, audience, keyInfo, isFilePath);
     }
 
     public static Builder builder() {
@@ -83,6 +85,7 @@ public class YufuAuth implements IYufuAuth {
         private String publicKeyPath;
         private String publicKeyString;
         private String issuer;
+        private List<String> audience = new ArrayList<>();
         private String keyFingerPrint;
         private String tenantId;
         private SDKRole sdkRole;
@@ -112,6 +115,16 @@ public class YufuAuth implements IYufuAuth {
             return this;
         }
 
+        public Builder audience(String audience) {
+            this.audience.add(audience);
+            return this;
+        }
+
+        public Builder audience(List<String> audience) {
+            this.audience.addAll(audience);
+            return this;
+        }
+
         public Builder tenant(String tnt) {
             this.tenantId = tnt;
             return this;
@@ -124,12 +137,18 @@ public class YufuAuth implements IYufuAuth {
 
         public YufuAuth build() throws YufuInitException {
             if (this.sdkRole == SP) {
+                if (tenantId == null) {
+                    throw new YufuInitException("tenantId must be set with SP Role");
+                }
+                if (issuer == null) {
+                    throw new YufuInitException("issuer must be set with SP Role");
+                }
                 if (publicKeyPath != null) {
-                    return new YufuAuth(
+                    return new YufuAuth(tenantId, issuer, audience,
                         this.publicKeyPath, true
                     );
                 } else if (publicKeyString != null) {
-                    return new YufuAuth(
+                    return new YufuAuth(tenantId, issuer, audience,
                         this.publicKeyString, false
                     );
                 } else {

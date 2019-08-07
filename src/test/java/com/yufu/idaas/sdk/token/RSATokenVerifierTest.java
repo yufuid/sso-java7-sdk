@@ -1,8 +1,7 @@
 package com.yufu.idaas.sdk.token;
 
+import com.google.common.collect.ImmutableList;
 import com.yufu.idaas.sdk.exception.*;
-import com.yufu.idaas.sdk.token.JWT;
-import com.yufu.idaas.sdk.token.RSATokenVerifier;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,9 +35,9 @@ public class RSATokenVerifierTest {
         "gClNOyvznotnKqihUQIDAQAB\n" +
         "-----END PUBLIC KEY-----";
 
-
     private void setUpFileKeyCorrectly() throws Exception {
         verifier = new RSATokenVerifier(
+            "297220", "yufu", ImmutableList.of("test"),
             this.getClass().getResource("").getPath() + "testPublicKey.pem",
             true
         );
@@ -48,6 +47,7 @@ public class RSATokenVerifierTest {
     public void verifyWithStringPublicKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
+            "297220", "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR,
             false
         );
@@ -58,6 +58,7 @@ public class RSATokenVerifierTest {
     public void failedWithoutKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
+            "297220", "yufu", ImmutableList.of("test"),
             "",
             true
         );
@@ -67,6 +68,7 @@ public class RSATokenVerifierTest {
     public void failedWithKeyInBadFormat() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
+            "297220", "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR.substring(5),
             false
         );
@@ -80,7 +82,6 @@ public class RSATokenVerifierTest {
         Assert.assertEquals("test@yufu.com", jwt.getSubject());
         Assert.assertEquals("297220", jwt.getClaims().get("tnt"));
     }
-
 
     @Test(expected = BaseVerifyException.class)
     public void verifyWithBlankToken() throws Exception {

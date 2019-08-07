@@ -18,6 +18,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
+
+import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_ID_KEY;
 
 /**
  * Created by shuowang on 2018/6/11.
@@ -25,9 +28,21 @@ import java.util.Date;
 public class RSATokenVerifier implements ITokenVerifier {
 
     private RSAPublicKey publicKey;
+    private String tenantId;
+    private List<String> audience;
+    private String issuer;
 
-    public RSATokenVerifier(String publicKeyInfo, boolean isFilePath) throws YufuInitException {
-
+    public RSATokenVerifier(
+        String tenantId,
+        String issuer,
+        List<String> audience,
+        String publicKeyInfo,
+        boolean isFilePath
+    ) throws
+        YufuInitException {
+        this.tenantId = tenantId;
+        this.issuer = issuer;
+        this.audience = audience;
         try {
             String publicKeyString;
             if (isFilePath) {
@@ -71,6 +86,21 @@ public class RSATokenVerifier implements ITokenVerifier {
         SignedJWT jwt;
         try {
             jwt = SignedJWT.parse(token);
+
+            //verify tenant
+            if (!tenantId.equals(jwt.getJWTClaimsSet().getClaim(TENANT_ID_KEY))) {
+                throw new InvalidTenantException();
+            }
+
+            //verify issuer
+            if (!issuer.equals(jwt.getJWTClaimsSet().getIssuer())) {
+                throw new InvalidIssuerException();
+            }
+
+            //verify audience
+            if (!audience.containsAll(jwt.getJWTClaimsSet().getAudience())) {
+                throw new InvalidAudienceException();
+            }
 
             // verify time
             Date now = new Date();
