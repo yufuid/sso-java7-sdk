@@ -85,7 +85,7 @@ public class YufuAuth implements IYufuAuth {
         private String publicKeyPath;
         private String publicKeyString;
         private String issuer;
-        private List<String> audience = new ArrayList<>();
+        private List<String> audience = new ArrayList<String>();
         private String keyFingerPrint;
         private String tenantId;
         private SDKRole sdkRole;

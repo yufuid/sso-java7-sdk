@@ -71,11 +71,11 @@ public class RSATokenVerifier implements ITokenVerifier {
             throw new YufuInitException("Public key file can not be read: " + e.getMessage());
         } catch (NoSuchAlgorithmException e) {
             throw new YufuInitException("Cannot find algorithm " + e.getMessage());
-        } catch (InvalidKeySpecException | IllegalArgumentException e) {
+        } catch (InvalidKeySpecException e) {
+            throw new YufuInitException("Invalid Key " + e.getMessage());
+        } catch (IllegalArgumentException e) {
             throw new YufuInitException("Invalid Key " + e.getMessage());
         }
-
-        this.publicKey = publicKey;
     }
 
     public JWT verify(final String token) throws BaseVerifyException {

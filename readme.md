@@ -45,7 +45,7 @@
              .build();
 ```
 
-2. 调用第1部生成的实例`verify`验证单点登录url里的token（自动验证有效期、Issuer、Audience、签名等），如通过，说明该令牌来受信任的有效租户(企业/组织)，样例
+2. 调用第1步生成的实例`verify`验证单点登录url里的token（自动验证有效期、Issuer、Audience、签名等），如通过，说明该令牌来受信任的有效租户(企业/组织)，样例
 ```
   String idToken = getIdToken();                // 从URL中获得 ID token(queryParam的key为'id_token')
   JWT claims = serviceProvider.verify(idToken);    // 使用验证玉符SDK实例进行验证, 如果成功会返回包含用户信息的对象，失败则会产生授权错误的异常
