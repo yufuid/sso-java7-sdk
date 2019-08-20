@@ -50,7 +50,7 @@
   String idToken = getIdToken();                // 从URL中获得 ID token(queryParam的key为'id_token')
   JWT claims = serviceProvider.verify(idToken);    // 使用验证玉符SDK实例进行验证, 如果成功会返回包含用户信息的对象，失败则会产生授权错误的异常
   String username = claims.getSubject();        // 用户名称
-  String tenant = claims.getClaims().get("tnt"); // 租户名称
+  String tenant = claims.getClaims().get("tnt_id"); // 租户名称
 ```
 
 3. 根据第2步获取的用户信息，服务提供商(SP)在token验证通过后，取出token中用户名称等必要信息，进行相应登录鉴权，否则提示用户登录失败

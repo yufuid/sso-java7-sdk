@@ -5,6 +5,8 @@ import com.yufu.idaas.sdk.exception.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_ID_KEY;
+
 /**
  * Created by vegachen on 10/29/18.
  */
@@ -14,19 +16,19 @@ public class RSATokenVerifierTest {
 
     private static String
         longLiveValidToken =
-        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50IjoiMjk3MjIwIiwiZXhwIjo5OTUzODcxMzY3NywiaWF0IjoxNTI4NzEzMDc3fQ.cSy7Wye3Gl03tu96fpypXJ_WQa0HTMeMgfdzzfFHhHluuak7YdxnYpuybhjyA4pi4HdJRVeermRIuh4e72dpQGkAcX9jem_WKBNCUgFoO7iTGhhb0G4wfv-G0gfE4AKTmdVBWi8SB5JkhTCWZVFkl-kzWUFGDurod2DD-LljBaQ";
+        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50X2lkIjoidG4teXVmdSIsImV4cCI6OTk1Mzg3MTM2NzcsImlhdCI6MTUyODcxMzA3N30.jcSgJ8Mh19VlYLEcYAgE1v3vQzyuE3MTgfYLewoZ1W57M5Vb-MB5OVb0W-kuJ52pNUYffSax7KaBsjAsIdEVZHajgWIKNO4xeS_vT1nlksbpCchS6F-8vmpxybIBblLpt19_m2Ii7MXNHMCkn2-XSajE_r6Ln7F95TWyVUdRkmI";
 
     private static String
         expiredValidToken =
-        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50IjoiMjk3MjIwIiwiZXhwIjoxNTI4NzEzNjc3LCJpYXQiOjE1Mjg3MTMwNzd9.juOba6uJk4tG8tM6biHzThyxoHFigYX3O2FQkOjAyzk_8ZlWX7ijiOPbLaldemZhK2Tcuru8YrP6fhlXMQk5IdZVji0xc_-hc01kEoBHgE2BkQBgtzpCn-VXkthXpLuhBuMGps7V5USpFEDF4tA4Sb3Egu0jSEeeD2GsTz6O2Sw";
-
+        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50X2lkIjoidG4teXVmdSIsImV4cCI6MTUyODcxMzY3NywiaWF0IjoxNTI4NzEzMDc3fQ.x-HS8R_C8Zm1QvQ-1YuLQ1KgGZpMiOIgUgx90zQzq0VVtnC81Ialmcxsa6c7y2_Cc0yWoMFcB8z2WGKF_2S4_fwGL_YRVow5Io4VEIveWNQPmUDUHOvJd2wkTZBy9b5MxROjoskDX4USYq5kq146SoVKDgW95flvRgxS-J2iJGI";
     private static String
         tokenWithWrongSign =
-        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50IjoiMjk3MjIwIiwiZXhwIjo5OTUzODcxMzY3NywiaWF0IjoxNTI4NzEzMDc3fQ.cSy7Wye3Gl03tu96fpypXJ_WQa0HTMeMgfdzzfFHhHluuak7YdxnYpuybhjyA4pi4HdJRVeermRIuh4e72dpQGkAcX9jem_WKBNCUgFoO7iTGhhb0G4wfv-G0gfE4AKTmdV";
+        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50X2lkIjoidG4teXVmdSIsImV4cCI6OTk1Mzg3MTM2NzcsImlhdCI6MTUyODcxMzA3N30.Na0Ckq2nI1c3uel3jAVoxhdG3fMQ6zrGbIAm1azATFcFl_f6UFP8EvkSA3W0jhWDVW_kqpDlGzAVWmDyBPbBG_F68WPtW6B8o40zcpu52Sm4OR3HvNtDqFAanKjFOZkm9VwZe2sqJwqrKRXx6tPZthj7DWIhjqhgdBHvG9lTssw";
 
     private static String
         tooEarlyToken =
-        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50IjoiMjk3MjIwIiwiZXhwIjo5OTUzODcxMzY3NywibmJmIjo5OTUzODcxMzY3NywiaWF0IjoxNTI4NzEzMDc3fQ.FqfJkZMcukMfHCQ4xsZE4L0X6OCM-opv5golC6G9LEu0AoYV7IXUtFUZE80Nlsjj0Mak1zqaAzZwSQpBrNfzbyxHrc8itc01frbYjyYP0eAeIz5gHzYpLjGHGLv4MDSp6PlHOnRQx3gSrZeYTmFCmKZ7bmdmzrO5K506VIjH44M";
+        "eyJraWQiOiJ0ZXN0a2V5aWQiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiJ0ZXN0Iiwic3ViIjoidGVzdEB5dWZ1LmNvbSIsInN0eXBlIjoiZW1haWwiLCJpc3MiOiJ5dWZ1IiwidG50X2lkIjoidG4teXVmdSIsImV4cCI6OTk1Mzg3MTM2NzcsIm5iZiI6OTk1Mzg3MTM2NzcsImlhdCI6MTUyODcxMzA3N30.ZVxLaE92IIf_0ZJnYTA7I8NdnjqrmybbmRQMBisEDadK5N51PvIft2wjAtMYOqi1MBiK9qlan82PsbbQG_Pl6EM3Vhw1wJqhgda65Je_MbxE_knpN8INP-TRS9FyI8N3oZeoe52SIuyOYSAAOOxfiaELUM7tYP_qW140ZtJ2LbU";
+
     private static String
         PUBLIC_KEY_STR = "-----BEGIN PUBLIC KEY-----\n" +
         "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDu4W0SAH5EiYxeYcw+R52MNQvX\n" +
@@ -37,7 +39,7 @@ public class RSATokenVerifierTest {
 
     private void setUpFileKeyCorrectly() throws Exception {
         verifier = new RSATokenVerifier(
-            "297220", "yufu", ImmutableList.of("test"),
+            "tn-yufu", "yufu", ImmutableList.of("test"),
             this.getClass().getResource("").getPath() + "testPublicKey.pem",
             true
         );
@@ -47,7 +49,7 @@ public class RSATokenVerifierTest {
     public void verifyWithStringPublicKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "297220", "yufu", ImmutableList.of("test"),
+            "tn-yufu", "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR,
             false
         );
@@ -58,7 +60,7 @@ public class RSATokenVerifierTest {
     public void failedWithoutKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "297220", "yufu", ImmutableList.of("test"),
+            "tn-yufu", "yufu", ImmutableList.of("test"),
             "",
             true
         );
@@ -68,7 +70,7 @@ public class RSATokenVerifierTest {
     public void failedWithKeyInBadFormat() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "297220", "yufu", ImmutableList.of("test"),
+            "tn-yufu", "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR.substring(5),
             false
         );
@@ -80,7 +82,7 @@ public class RSATokenVerifierTest {
         JWT jwt = verifier.verify(longLiveValidToken);
         Assert.assertEquals("yufu", jwt.getIssuer());
         Assert.assertEquals("test@yufu.com", jwt.getSubject());
-        Assert.assertEquals("297220", jwt.getClaims().get("tnt"));
+        Assert.assertEquals("tn-yufu", jwt.getClaims().get(TENANT_ID_KEY));
     }
 
     @Test(expected = BaseVerifyException.class)

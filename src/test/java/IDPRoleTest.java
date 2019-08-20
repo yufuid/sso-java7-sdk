@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.yufu.idaas.sdk.constants.YufuTokenConstants.APP_INSTANCE_ID_KEY;
+import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_ID_KEY;
 
 /**
  * Created by shuowang on 2018/6/4.
@@ -87,6 +88,6 @@ public class IDPRoleTest {
         JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
         Assert.assertEquals("testAppInstanceId", claimsSet.getStringClaim(APP_INSTANCE_ID_KEY));
         Assert.assertEquals("testIssuer", claimsSet.getIssuer());
-        Assert.assertEquals("testTenant", claimsSet.getStringClaim("tnt"));
+        Assert.assertEquals("testTenant", claimsSet.getStringClaim(TENANT_ID_KEY));
     }
 }
