@@ -27,18 +27,19 @@ public class YufuAuth implements IYufuAuth {
         String issuer,
         String keyPath,
         String tenantId,
+        String tenantName,
         String keyFingerPrint
     ) throws YufuInitException {
         String keyId = keyFingerPrint == null
             ? issuer
             : issuer + YufuTokenConstants.KEY_ID_SEPARATOR + keyFingerPrint;
-        this.tokenGenerator = new RSATokenGenerator(keyPath, null, issuer, tenantId, keyId);
+        this.tokenGenerator = new RSATokenGenerator(keyPath, null, issuer, tenantId, tenantName, keyId);
     }
 
     private YufuAuth(
-        String tenantId, String issuer, List<String> audience, String keyInfo, boolean isFilePath
+        String tenantId, String tenantName, String issuer, List<String> audience, String keyInfo, boolean isFilePath
     ) throws YufuInitException {
-        this.tokenVerifier = new RSATokenVerifier(tenantId, issuer, audience, keyInfo, isFilePath);
+        this.tokenVerifier = new RSATokenVerifier(tenantId, tenantName, issuer, audience, keyInfo, isFilePath);
     }
 
     public static Builder builder() {
@@ -88,6 +89,7 @@ public class YufuAuth implements IYufuAuth {
         private List<String> audience = new ArrayList<String>();
         private String keyFingerPrint;
         private String tenantId;
+        private String tenantName;
         private SDKRole sdkRole;
 
         public Builder privateKeyPath(String path) {
@@ -125,8 +127,13 @@ public class YufuAuth implements IYufuAuth {
             return this;
         }
 
-        public Builder tenant(String tnt) {
-            this.tenantId = tnt;
+        public Builder tenant(String tenantId) {
+            this.tenantId = tenantId;
+            return this;
+        }
+
+        public Builder tnt(String tenantName) {
+            this.tenantName = tenantName;
             return this;
         }
 
@@ -137,18 +144,18 @@ public class YufuAuth implements IYufuAuth {
 
         public YufuAuth build() throws YufuInitException {
             if (this.sdkRole == SP) {
-                if (tenantId == null) {
-                    throw new YufuInitException("tenantId must be set with SP Role");
+                if (tenantId == null && tenantName == null) {
+                    throw new YufuInitException("tenant must be set with SP Role");
                 }
                 if (issuer == null) {
                     throw new YufuInitException("issuer must be set with SP Role");
                 }
                 if (publicKeyPath != null) {
-                    return new YufuAuth(tenantId, issuer, audience,
+                    return new YufuAuth(tenantId, tenantName, issuer, audience,
                         this.publicKeyPath, true
                     );
                 } else if (publicKeyString != null) {
-                    return new YufuAuth(tenantId, issuer, audience,
+                    return new YufuAuth(tenantId, tenantName, issuer, audience,
                         this.publicKeyString, false
                     );
                 } else {
@@ -165,6 +172,7 @@ public class YufuAuth implements IYufuAuth {
                     this.issuer,
                     this.privateKeyPath,
                     this.tenantId,
+                    this.tenantName,
                     this.keyFingerPrint
                 );
             }

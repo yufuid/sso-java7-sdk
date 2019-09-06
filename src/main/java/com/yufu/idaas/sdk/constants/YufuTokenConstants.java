@@ -6,6 +6,7 @@ package com.yufu.idaas.sdk.constants;
 public class YufuTokenConstants {
     public final static String IDP_TOKEN_CONSUME_URL = "https://portal.yufuid.com/api/v1/external/sso";
     public final static String TENANT_ID_KEY = "tnt_id";
+    public final static String TENANT_NAME_KEY = "tnt";
     public final static String APP_INSTANCE_ID_KEY = "appInstanceId";
     public final static String KEY_ID_SEPARATOR = "###";
     public final static String AUDIENCE_YUFU = "yufu";

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_ID_KEY;
+import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_NAME_KEY;
 
 /**
  * Created by shuowang on 2018/6/11.
@@ -29,11 +30,13 @@ public class RSATokenVerifier implements ITokenVerifier {
 
     private RSAPublicKey publicKey;
     private String tenantId;
+    private String tenantName;
     private List<String> audience;
     private String issuer;
 
     public RSATokenVerifier(
         String tenantId,
+        String tenantName,
         String issuer,
         List<String> audience,
         String publicKeyInfo,
@@ -41,6 +44,7 @@ public class RSATokenVerifier implements ITokenVerifier {
     ) throws
         YufuInitException {
         this.tenantId = tenantId;
+        this.tenantName = tenantName;
         this.issuer = issuer;
         this.audience = audience;
         try {
@@ -88,7 +92,9 @@ public class RSATokenVerifier implements ITokenVerifier {
             jwt = SignedJWT.parse(token);
 
             //verify tenant
-            if (!tenantId.equals(jwt.getJWTClaimsSet().getClaim(TENANT_ID_KEY))) {
+            if (!tenantId.equals(jwt.getJWTClaimsSet().getClaim(TENANT_ID_KEY)) &&
+                !tenantName.equals(jwt.getJWTClaimsSet().getClaim(TENANT_NAME_KEY))
+            ) {
                 throw new InvalidTenantException();
             }
 

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import static com.yufu.idaas.sdk.constants.YufuTokenConstants.APP_INSTANCE_ID_KEY;
 import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_ID_KEY;
+import static com.yufu.idaas.sdk.constants.YufuTokenConstants.TENANT_NAME_KEY;
 
 /**
  * Created by shuowang on 2018/6/4.
@@ -31,7 +32,7 @@ public class IDPRoleTest {
         yufuAuth = YufuAuth.builder()
             .issuer("testIssuer")
             .sdkRole(SDKRole.IDP)
-            .tenant("testTenant")
+            .tnt("testTenant")
             .privateKeyPath(keyPath)
             .keyFingerPrint("2bf935821aa33e693d39ab569ba557aa0af8e02e")
             .build();
@@ -88,6 +89,6 @@ public class IDPRoleTest {
         JWTClaimsSet claimsSet = signedJWT.getJWTClaimsSet();
         Assert.assertEquals("testAppInstanceId", claimsSet.getStringClaim(APP_INSTANCE_ID_KEY));
         Assert.assertEquals("testIssuer", claimsSet.getIssuer());
-        Assert.assertEquals("testTenant", claimsSet.getStringClaim(TENANT_ID_KEY));
+        Assert.assertEquals("testTenant", claimsSet.getStringClaim(TENANT_NAME_KEY));
     }
 }

@@ -32,19 +32,22 @@ import static com.yufu.idaas.sdk.constants.YufuTokenConstants.*;
 public class RSATokenGenerator implements ITokenGenerator {
     private final RSASSASigner signer;
     private final String issuer;
-    private final String tenant;
+    private final String tenantId;
+    private final String tenantName;
     private final JWSHeader header;
 
     public RSATokenGenerator(
         String privateKeyPath,
         String password,
         String issuer,
-        String tenant,
+        String tenantId,
+        String tenantName,
         String keyId
     ) throws YufuInitException {
         try {
             this.issuer = issuer;
-            this.tenant = tenant;
+            this.tenantId = tenantId;
+            this.tenantName = tenantName;
             this.header = new JWSHeader.Builder(JWSAlgorithm.parse("RS256"))
                 .keyID(keyId)
                 .type(JOSEObjectType.JWT)
@@ -90,15 +93,18 @@ public class RSATokenGenerator implements ITokenGenerator {
             .issuer(this.issuer)
             .subject((String) payload.get("sub"));
         Set<String> claimRegisteredNames = JWTClaimsSet.getRegisteredNames();
-        Set<String> headerRegisteredNames =JWSHeader.getRegisteredParameterNames();
+        Set<String> headerRegisteredNames = JWSHeader.getRegisteredParameterNames();
         for (Map.Entry<String, Object> claim : payload.entrySet()) {
             if (!claimRegisteredNames.contains(claim.getKey()) &&
                 !headerRegisteredNames.contains(claim.getKey())) {
                 claimsBuilder.claim(claim.getKey(), claim.getValue());
             }
         }
-        if (this.tenant != null) {
-            claimsBuilder.claim(TENANT_ID_KEY, this.tenant);
+        if (this.tenantId != null) {
+            claimsBuilder.claim(TENANT_ID_KEY, this.tenantId);
+        }
+        if (this.tenantName != null) {
+            claimsBuilder.claim(TENANT_NAME_KEY, this.tenantName);
         }
         SignedJWT signedJWT = new SignedJWT(header, claimsBuilder.build());
         try {
@@ -120,15 +126,18 @@ public class RSATokenGenerator implements ITokenGenerator {
             .issuer(this.issuer)
             .subject(jwt.getSubject());
         Set<String> claimRegisteredNames = JWTClaimsSet.getRegisteredNames();
-        Set<String> headerRegisteredNames =JWSHeader.getRegisteredParameterNames();
+        Set<String> headerRegisteredNames = JWSHeader.getRegisteredParameterNames();
         for (Map.Entry<String, Object> claim : jwt.getClaims().entrySet()) {
             if (!claimRegisteredNames.contains(claim.getKey()) &&
                 !headerRegisteredNames.contains(claim.getKey())) {
                 claimsBuilder.claim(claim.getKey(), claim.getValue());
             }
         }
-        if (this.tenant != null) {
-            claimsBuilder.claim(TENANT_ID_KEY, this.tenant);
+        if (this.tenantId != null) {
+            claimsBuilder.claim(TENANT_ID_KEY, this.tenantId);
+        }
+        if (this.tenantName != null) {
+            claimsBuilder.claim(TENANT_NAME_KEY, this.tenantName);
         }
         SignedJWT signedJWT = new SignedJWT(header, claimsBuilder.build());
         try {

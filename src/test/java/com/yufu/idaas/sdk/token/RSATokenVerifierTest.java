@@ -39,7 +39,7 @@ public class RSATokenVerifierTest {
 
     private void setUpFileKeyCorrectly() throws Exception {
         verifier = new RSATokenVerifier(
-            "tn-yufu", "yufu", ImmutableList.of("test"),
+            "tn-yufu", null, "yufu", ImmutableList.of("test"),
             this.getClass().getResource("").getPath() + "testPublicKey.pem",
             true
         );
@@ -49,7 +49,7 @@ public class RSATokenVerifierTest {
     public void verifyWithStringPublicKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "tn-yufu", "yufu", ImmutableList.of("test"),
+            "tn-yufu", null, "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR,
             false
         );
@@ -60,7 +60,7 @@ public class RSATokenVerifierTest {
     public void failedWithoutKey() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "tn-yufu", "yufu", ImmutableList.of("test"),
+            "tn-yufu", null, "yufu", ImmutableList.of("test"),
             "",
             true
         );
@@ -70,7 +70,7 @@ public class RSATokenVerifierTest {
     public void failedWithKeyInBadFormat() throws Exception {
         // Override verifier
         verifier = new RSATokenVerifier(
-            "tn-yufu", "yufu", ImmutableList.of("test"),
+            "tn-yufu", null, "yufu", ImmutableList.of("test"),
             PUBLIC_KEY_STR.substring(5),
             false
         );

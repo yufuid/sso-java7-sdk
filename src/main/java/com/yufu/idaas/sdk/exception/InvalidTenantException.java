@@ -6,6 +6,6 @@ package com.yufu.idaas.sdk.exception;
  */
 public class InvalidTenantException extends BaseVerifyException {
     public InvalidTenantException() {
-        super("tenantId is invalid");
+        super("tenant is invalid");
     }
 }
