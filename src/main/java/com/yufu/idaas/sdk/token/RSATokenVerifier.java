@@ -1,5 +1,6 @@
 package com.yufu.idaas.sdk.token;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.BaseEncoding;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -92,39 +93,46 @@ public class RSATokenVerifier implements ITokenVerifier {
             jwt = SignedJWT.parse(token);
 
             //verify tenant
-            if (!tenantId.equals(jwt.getJWTClaimsSet().getClaim(TENANT_ID_KEY)) &&
-                !tenantName.equals(jwt.getJWTClaimsSet().getClaim(TENANT_NAME_KEY))
-            ) {
-                throw new InvalidTenantException();
+            if (tenantId != null) {
+                Preconditions.checkArgument(
+                    tenantId.equals(jwt.getJWTClaimsSet().getClaim(TENANT_ID_KEY)),
+                    new InvalidTenantException()
+                );
+            }
+
+            if (tenantName != null) {
+                Preconditions.checkArgument(
+                    tenantName.equals(jwt.getJWTClaimsSet().getClaim(TENANT_NAME_KEY)),
+                    new InvalidTenantException()
+                );
             }
 
             //verify issuer
-            if (!issuer.equals(jwt.getJWTClaimsSet().getIssuer())) {
-                throw new InvalidIssuerException();
-            }
+            Preconditions.checkArgument(issuer.equals(jwt.getJWTClaimsSet().getIssuer()), new InvalidIssuerException());
 
             //verify audience
-            if (!audience.containsAll(jwt.getJWTClaimsSet().getAudience())) {
-                throw new InvalidAudienceException();
-            }
+            Preconditions.checkArgument(
+                audience.containsAll(jwt.getJWTClaimsSet().getAudience()),
+                new InvalidAudienceException()
+            );
 
             // verify time
             Date now = new Date();
-            if (!verifyExpiration(now, jwt.getJWTClaimsSet().getExpirationTime())) {
-                throw new TokenExpiredException();
-            }
-            if (!verifyNotBefore(now, jwt.getJWTClaimsSet().getNotBeforeTime())) {
-                throw new TokenTooEarlyException();
-            }
+            Preconditions.checkArgument(
+                verifyExpiration(now, jwt.getJWTClaimsSet().getExpirationTime()),
+                new TokenExpiredException()
+            );
 
-            if (null == publicKey) {
-                // Can't reach
-                throw new CannotRetrieveKeyException();
-            }
+            Preconditions.checkArgument(
+                verifyNotBefore(now, jwt.getJWTClaimsSet().getNotBeforeTime()),
+                new TokenTooEarlyException()
+            );
+
+            // Can't reach
+            Preconditions.checkNotNull(publicKey, new CannotRetrieveKeyException());
+
             // verify signature
-            if (!verifySignature(jwt, publicKey)) {
-                throw new InvalidSignatureException();
-            }
+            Preconditions.checkArgument(verifySignature(jwt, publicKey), new InvalidSignatureException());
 
             return convert(jwt);
         } catch (ParseException e) {
