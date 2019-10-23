@@ -103,19 +103,19 @@ public class RSATokenVerifierTest {
         verifier.verify(null);
     }
 
-    @Test(expected = TokenExpiredException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void verifyWithExpiredToken() throws Exception {
         setUpFileKeyCorrectly();
         verifier.verify(expiredValidToken);
     }
 
-    @Test(expected = TokenTooEarlyException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void verifyWithTooEarlyToken() throws Exception {
         setUpFileKeyCorrectly();
         verifier.verify(tooEarlyToken);
     }
 
-    @Test(expected = InvalidSignatureException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void verifyWithInvalidSignatureToken() throws Exception {
         setUpFileKeyCorrectly();
         verifier.verify(tokenWithWrongSign);
